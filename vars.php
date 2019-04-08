@@ -1,7 +1,7 @@
 <?php
 echo "<br />Variabili";
 $isedited    = $update["edited_message"];
-$isforwarded = $update["message"]["forward_from"];
+$isforwarded = (is_array($update["message"]["forward_from"]) ? $update["message"]["forward_from"] : $update["message"]["forward_from_caht"] );
 $ischannel   = $update["message"]["channel_post"];
 if (!$config["funziona_inoltrati"] && $isforwarded) {
     return;
@@ -14,10 +14,17 @@ if (!$config["funziona_canali"] && $ischannel) {
     return;
 }
 if ($isforwarded && $config["funziona_inoltrati"]) {
-    $fromnome     = $update["message"]["forward_from"]["first_name"];
-    $fromcognome  = $update["message"]["forward_from"]["last_name"];
-    $fromusername = $update["message"]["forward_from"]["username"];
-    $fromID       = $update["message"]["forward_from"]["id"];
+	if(is_array($update["message"]["forward_from"])) {
+		$fromnome     = $update["message"]["forward_from"]["first_name"];
+		$fromcognome  = $update["message"]["forward_from"]["last_name"];
+		$fromusername = $update["message"]["forward_from"]["username"];
+		$fromID       = $update["message"]["forward_from"]["id"];
+	} else {
+		$fromnome     = $update["message"]["forward_from_chat"]["first_name"];
+		$fromcognome  = $update["message"]["forward_from_chat"]["last_name"];
+		$fromusername = $update["message"]["forward_from_chat"]["username"];
+		$fromID       = $update["message"]["forward_from_chat"]["id"];
+	}
 }
 if ($isedited && $config["funziona_modificati"]) {
     $update['message'] = $update['edited_message'];
@@ -60,7 +67,7 @@ if ($update["callback_query"]) {
     $username = $update["callback_query"]["from"]["username"];
     $fullname = $nome . " " . $cognome;
     $lingua   = $update["callback_query"]["from"]["language_code"];
-}
+	}
 if ($update["message"]["reply_to_message"]) {
     $replymsg          = $update["message"]["reply_to_message"]["text"];
     $replyid           = $update["message"]["reply_to_message"]["message_id"];
@@ -68,9 +75,16 @@ if ($update["message"]["reply_to_message"]) {
     $replynome         = $update["message"]["reply_to_message"]["from"]["first_name"];
     $replycognome      = $update["message"]["reply_to_message"]["from"]["last_name"];
     $replyusername     = $update["message"]["reply_to_message"]["from"]["username"];
-    $replyfromnome     = $update["message"]["reply_to_message"]["forward_from"]["first_name"];
-    $replyfromcognome  = $update["message"]["reply_to_message"]["forward_from"]["last_name"];
-    $replyfromusername = $update["message"]["reply_to_message"]["forward_from"]["username"];
-    $replyfromID       = $update["message"]["reply_to_message"]["forward_from"]["id"];
+	if(is_array($update["message"]["forward_from"])) {
+		$replyfromnome     = $update["message"]["reply_to_message"]["forward_from"]["first_name"];
+		$replyfromcognome  = $update["message"]["reply_to_message"]["forward_from"]["last_name"];
+		$replyfromusername = $update["message"]["reply_to_message"]["forward_from"]["username"];
+		$replyfromID       = $update["message"]["reply_to_message"]["forward_from"]["id"];
+	} else {
+		$replyfromnome     = $update["message"]["reply_to_message"]["forward_from_chat"]["first_name"];
+		$replyfromcognome  = $update["message"]["reply_to_message"]["forward_from_chat"]["last_name"];
+		$replyfromusername = $update["message"]["reply_to_message"]["forward_from_chat"]["username"];
+		$replyfromID       = $update["message"]["reply_to_message"]["forward_from_chat"]["id"];
+	}
 }
 $isadmin = in_array($chatID, $admin); //Restituisce true se la chat è admin
